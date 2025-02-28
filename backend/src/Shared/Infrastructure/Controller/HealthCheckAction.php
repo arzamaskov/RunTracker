@@ -1,8 +1,6 @@
 <?php
 
-// vim: set ts=4 sw=4 sts=4 et:
-
-namespace App\Controller;
+namespace App\Shared\Infrastructure\Controller;
 
 use Symfony\Component\HttpFoundation\{JsonResponse, Response};
 use Symfony\Component\Routing\Annotation\Route;

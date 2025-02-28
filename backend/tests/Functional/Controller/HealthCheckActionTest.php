@@ -1,7 +1,5 @@
 <?php
 
-// vim: set ts=4 sw=4 sts=4 et:
-
 namespace App\Tests\Functional\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
