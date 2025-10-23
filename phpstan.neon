@@ -60,9 +60,3 @@ parameters:
 rules:
     - PHPStanRules\NoIlluminateInDomainAndApplicationRule
 
-services:
-    -
-        class: PHPStanRules\NoIlluminateInDomainAndApplicationRule
-        tags:
-            - phpstan.rules.rule
-
