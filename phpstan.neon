@@ -34,7 +34,8 @@ parameters:
     #   - Разрешено: всё, включая Laravel компоненты
     #
     # ⚠️  ВАЖНО: Следите за соблюдением этих правил при code review!
-    # Для автоматической проверки архитектурных зависимостей рекомендуется deptrac
+    # ✅ АВТОМАТИЧЕСКАЯ ПРОВЕРКА включена через кастомное правило PHPStan
+    # Файл: phpstan-rules/NoIlluminateInDomainAndApplicationRule.php
     
     # Строгие правила от phpstan-strict-rules:
     # - Запрет empty() - используйте явные проверки
@@ -54,4 +55,13 @@ parameters:
             paths:
                 - config/app.php
                 - config/database.php
+
+rules:
+    - PHPStanRules\NoIlluminateInDomainAndApplicationRule
+
+services:
+    -
+        class: PHPStanRules\NoIlluminateInDomainAndApplicationRule
+        tags:
+            - phpstan.rules.rule
 
