@@ -129,6 +129,23 @@ test-coverage: ## Запустить тесты с покрытием
 test-filter: ## Запустить конкретный тест (make test-filter FILTER="TestName")
 	$(DC_EXEC) php php artisan test --filter=$(FILTER)
 
+lint: ## Проверить код на соответствие стандартам (Laravel Pint)
+	$(DC_EXEC) php ./vendor/bin/pint --test
+
+lint-fix: ## Автоматически исправить стиль кода (Laravel Pint)
+	$(DC_EXEC) php ./vendor/bin/pint
+
+pint: lint ## Алиас для lint
+
+pint-fix: lint-fix ## Алиас для lint-fix
+
+phpcs: lint ## Алиас для lint (совместимость)
+
+stan: ## Запустить статический анализ кода (PHPStan)
+	$(DC_EXEC) php ./vendor/bin/phpstan analyse --memory-limit=2G
+
+phpstan: stan ## Алиас для stan
+
 cache-clear: ## Очистить все кеши
 	$(DC_EXEC) php php artisan cache:clear
 	$(DC_EXEC) php php artisan config:clear

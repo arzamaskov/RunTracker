@@ -100,8 +100,11 @@ make backup-db       # Создать бэкап БД
 make restore-db FILE=backup.sql.gz  # Восстановить БД
 ```
 
-### Тестирование
+### Качество кода и тестирование
 ```bash
+make lint            # Проверка стиля кода (Laravel Pint)
+make lint-fix        # Автоматическое исправление стиля
+make stan            # Статический анализ (PHPStan level 5)
 make test            # Запустить тесты
 make test-coverage   # Запустить тесты с покрытием
 ```
@@ -193,10 +196,26 @@ make install         # Установит всё заново
 
 ### Перед коммитом
 ```bash
-make phpcs           # Проверка стиля кода
-make phpstan         # Статический анализ
+make lint            # Проверка стиля кода (Laravel Pint)
+make stan            # Статический анализ (PHPStan)
 make test            # Запуск тестов
 ```
+
+### Архитектурные правила
+При работе с модульным монолитом (DDD) важно соблюдать границы слоёв:
+
+**✅ Разрешено:**
+- Domain: чистая бизнес-логика без зависимостей от фреймворка
+- Application: использование только Domain слоя и интерфейсов
+- Infrastructure: любые технические зависимости (Eloquent, Facades, и т.д.)
+- UI: любые Laravel компоненты
+
+**❌ Запрещено:**
+- `use Illuminate\*` в `app/*/Domain/*` и `app/*/Application/*`
+- Прямая работа с БД в Domain и Application
+- HTTP зависимости (Request, Response) в Domain и Application
+
+⚠️ **Проверяйте это при code review!** Файл `phpstan.neon` содержит подробное описание правил.
 
 ### Формат коммитов
 ```

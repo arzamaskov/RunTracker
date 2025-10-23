@@ -1,0 +1,37 @@
+parameters:
+    level: 5
+    paths:
+        - app
+        - config
+        - database
+    excludePaths:
+        - vendor
+        - storage
+        - bootstrap/cache
+        - routes
+
+    # АРХИТЕКТУРНЫЕ ПРАВИЛА (DDD Clean Architecture):
+    #
+    # Domain слой (app/*/Domain/*):
+    #   - Только чистая бизнес-логика
+    #   - ЗАПРЕЩЕНО: use Illuminate\*, use Facades, use DB, use Request и т.д.
+    #   - Разрешено: Value Objects, Entities, Domain Events, Exceptions
+    #
+    # Application слой (app/*/Application/*):
+    #   - UseCases, Actions, DTOs, Commands, Queries
+    #   - ЗАПРЕЩЕНО: use Illuminate\*, прямая работа с БД, HTTP
+    #   - Разрешено: использование Domain слоя, интерфейсов репозиториев
+    #
+    # Infrastructure слой (app/*/Infrastructure/*):
+    #   - Реализации репозиториев, внешние API, парсеры
+    #   - Разрешено: Eloquent, Query Builder, внешние пакеты
+    #
+    # UI слой (app/*/UI/*):
+    #   - Controllers, Requests, Resources, Middleware
+    #   - Разрешено: всё, включая Laravel компоненты
+    #
+    # ⚠️  ВАЖНО: Следите за соблюдением этих правил при code review!
+    # Для автоматической проверки рекомендуется установить deptrac или phpat.
+
+    reportUnmatchedIgnoredErrors: false
+
