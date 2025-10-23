@@ -1,0 +1,49 @@
+# === Git ===
+.git
+.gitignore
+.gitattributes
+
+# === Docker ===
+.docker
+docker-compose*.yml
+Dockerfile
+.dockerignore
+
+# === IDE ===
+.idea
+.vscode
+.cursor
+*.swp
+*.swo
+*~
+
+# === Node ===
+node_modules
+npm-debug.log
+yarn-error.log
+
+# === Laravel ===
+/vendor
+/storage/*.key
+/public/hot
+/public/storage
+/bootstrap/cache/*
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+*.log
+
+# === Tests ===
+tests/
+phpunit.xml
+.phpunit.cache

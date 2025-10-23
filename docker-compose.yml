@@ -1,0 +1,108 @@
+services:
+  # Nginx веб-сервер
+  nginx:
+    image: nginx:1.28-alpine
+    container_name: 42k_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - 42k_network
+    restart: unless-stopped
+
+  # PHP-FPM
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: 42k_php
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-l42k}
+      - DB_USERNAME=${DB_USERNAME:-l42k_user}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - 42k_network
+    restart: unless-stopped
+
+  # MySQL база данных
+  mysql:
+    image: mysql:9.1
+    container_name: 42k_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_logs:/var/log/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE:-l42k}
+      - MYSQL_USER=${DB_USERNAME:-l42k_user}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root}
+    networks:
+      - 42k_network
+    restart: unless-stopped
+
+  # Redis для кеширования и очередей
+  redis:
+    image: redis:7.4-alpine
+    container_name: 42k_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - 42k_network
+    restart: unless-stopped
+
+  # Node.js для сборки фронтенда (Vite + Tailwind)
+  node:
+    image: node:22-alpine
+    container_name: 42k_node
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "5173:5173"
+    networks:
+      - 42k_network
+    restart: unless-stopped
+
+  # Mailpit для тестирования email (альтернатива MailHog)
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: 42k_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - 42k_network
+    restart: unless-stopped
+
+networks:
+  42k_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+  mysql_logs:
+    driver: local
+  redis_data:
+    driver: local
+
