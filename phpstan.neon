@@ -7,12 +7,12 @@ parameters:
         - app
         - config
         - database
-        - phpstan-rules
     excludePaths:
         - vendor
         - storage
         - bootstrap/cache
         - routes
+        - phpstan-rules
 
     # АРХИТЕКТУРНЫЕ ПРАВИЛА (DDD Clean Architecture):
     #
