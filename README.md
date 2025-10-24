@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/arzamaskov/run-app/actions/workflows/ci.yml/badge.svg)](https://github.com/arzamaskov/run-app/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-![Version](https://img.shields.io/badge/version-0.1.0-green.svg)
+![Version](https://img.shields.io/github/v/tag/arzamaskov/run-app?label=version)
 
 Приложение для учёта и анализа беговых тренировок.  
 Monorepo: единый **Laravel** (API + UI).
