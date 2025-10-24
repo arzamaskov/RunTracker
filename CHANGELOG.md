@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [2] - 2025-10-24
+
+## Added
+- Nginx конфигурация для production
+- Поддержка PostgreSQL вместо MySQL
+
+## Fixed
+- Настроен правильный роутинг для Laravel в nginx
+
+## Changed
+- Мигрировали с MySQL на PostgreSQL 16
+
 ## [1] - 2025-10-24
 
 ### Added
