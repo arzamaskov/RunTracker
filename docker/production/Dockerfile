@@ -123,5 +123,6 @@ WORKDIR /var/www/html
 # Копируем только public с собранными ассетами из prod стадии
 COPY --from=prod /var/www/html/public ./public
 
-# Nginx конфиг монтируется через volume в docker-compose
+# Копируем nginx конфиг для Laravel
+COPY docker/nginx/production.conf /etc/nginx/conf.d/default.conf
 
