@@ -24,35 +24,37 @@ services:
     volumes:
       - ./:/var/www/html
     environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-l42k}
-      - DB_USERNAME=${DB_USERNAME:-l42k_user}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-run_app}
+      - DB_USERNAME=${DB_USERNAME:-laravel}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - mysql
+      - postgres
       - redis
     networks:
       - 42k_network
     restart: unless-stopped
 
-  # MySQL база данных
-  mysql:
-    image: mysql:8.4
-    container_name: 42k_mysql
+  # PostgreSQL база данных
+  postgres:
+    image: postgres:16-alpine
+    container_name: 42k_postgres
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - mysql_logs:/var/log/mysql
-      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - postgres_data:/var/lib/postgresql/data
     environment:
-      - MYSQL_DATABASE=${DB_DATABASE:-run_app}
-      - MYSQL_USER=${DB_USERNAME:-laravel}
-      - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root}
+      - POSTGRES_DB=${DB_DATABASE:-run_app}
+      - POSTGRES_USER=${DB_USERNAME:-laravel}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-secret}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-laravel}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - 42k_network
     restart: unless-stopped
@@ -99,9 +101,7 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
-    driver: local
-  mysql_logs:
+  postgres_data:
     driver: local
   redis_data:
     driver: local

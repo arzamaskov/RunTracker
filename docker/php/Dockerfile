@@ -15,6 +15,7 @@ RUN apk add --no-cache --virtual .build-deps \
         make \
         oniguruma-dev \
         pcre-dev \
+        postgresql-dev \
         zlib-dev \
     # Установка runtime зависимостей
     && apk add --no-cache \
@@ -25,10 +26,11 @@ RUN apk add --no-cache --virtual .build-deps \
         icu-libs \
         libjpeg-turbo \
         libpng \
+        libpq \
         libxml2 \
         libzip \
-        mysql-client \
         oniguruma \
+        postgresql-client \
         zlib \
     # Компиляция PHP расширений
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -40,7 +42,7 @@ RUN apk add --no-cache --virtual .build-deps \
         mbstring \
         opcache \
         pdo \
-        pdo_mysql \
+        pdo_pgsql \
         pcntl \
         xml \
         zip \
