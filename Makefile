@@ -146,6 +146,8 @@ stan: ## Запустить статический анализ кода (PHPSta
 
 phpstan: stan ## Алиас для stan
 
+ci: lint stan test ## Комбо для локальной проверки перед git push
+
 cache-clear: ## Очистить все кеши
 	$(DC_EXEC) php php artisan cache:clear
 	$(DC_EXEC) php php artisan config:clear
