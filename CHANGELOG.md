@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+## [1] - 2025-10-24
+
 ### Added
 - Лендинг с секциями: hero, features, how it works, pricing, FAQ
 - Иконки и манифесты приложения (favicon, apple-touch-icon, web-app-manifest)
