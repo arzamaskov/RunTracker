@@ -91,7 +91,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/php/Dockerfile
+          file: docker/production/Dockerfile
           target: prod
           push: true
           cache-from: type=gha,scope=app
@@ -104,7 +104,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/php/Dockerfile
+          file: docker/production/Dockerfile
           target: prod
           push: true
           cache-from: type=gha,scope=app
@@ -118,7 +118,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/php/Dockerfile
+          file: docker/production/Dockerfile
           target: web
           push: true
           cache-from: type=gha,scope=web
@@ -131,7 +131,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/php/Dockerfile
+          file: docker/production/Dockerfile
           target: web
           push: true
           cache-from: type=gha,scope=web
