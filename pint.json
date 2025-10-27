@@ -1,7 +1,4 @@
 {
     "preset": "laravel",
-    "exclude": [
-        "phpstan-rules"
-    ]
+    "exclude": []
 }
-

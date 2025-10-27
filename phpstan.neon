@@ -6,6 +6,7 @@ parameters:
     level: 5
     paths:
         - app
+        - src
         - config
         - database
     excludePaths:
@@ -13,31 +14,8 @@ parameters:
         - storage
         - bootstrap/cache
         - routes
+    scanDirectories:
         - phpstan-rules
-
-    # АРХИТЕКТУРНЫЕ ПРАВИЛА (DDD Clean Architecture):
-    #
-    # Domain слой (app/*/Domain/*):
-    #   - Только чистая бизнес-логика
-    #   - ЗАПРЕЩЕНО: use Illuminate\*, use Facades, use DB, use Request и т.д.
-    #   - Разрешено: Value Objects, Entities, Domain Events, Exceptions
-    #
-    # Application слой (app/*/Application/*):
-    #   - UseCases, Actions, DTOs, Commands, Queries
-    #   - ЗАПРЕЩЕНО: use Illuminate\*, прямая работа с БД, HTTP
-    #   - Разрешено: использование Domain слоя, интерфейсов репозиториев
-    #
-    # Infrastructure слой (app/*/Infrastructure/*):
-    #   - Реализации репозиториев, внешние API, парсеры
-    #   - Разрешено: Eloquent, Query Builder, внешние пакеты
-    #
-    # UI слой (app/*/UI/*):
-    #   - Controllers, Requests, Resources, Middleware
-    #   - Разрешено: всё, включая Laravel компоненты
-    #
-    # ⚠️  ВАЖНО: Следите за соблюдением этих правил при code review!
-    # ✅ АВТОМАТИЧЕСКАЯ ПРОВЕРКА включена через кастомное правило PHPStan
-    # Файл: phpstan-rules/NoIlluminateInDomainAndApplicationRule.php
 
     # Строгие правила от phpstan-strict-rules:
     # - Запрет empty() - используйте явные проверки
