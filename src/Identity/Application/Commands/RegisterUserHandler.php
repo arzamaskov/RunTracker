@@ -19,6 +19,7 @@ class RegisterUserHandler
     {
         $user = $this->userFactory->create(
             new UserEmail($command->email),
+            $command->name,
             $command->plainPassword
         );
 

@@ -12,6 +12,7 @@ final class User extends AggregateRoot
     public function __construct(
         private readonly UserId $id,
         private UserEmail $email,
+        private readonly string $name,
         private string $password
     ) {
         $this->record(new UserWasCreated($this->id, $this->email));
@@ -20,6 +21,11 @@ final class User extends AggregateRoot
     public function id(): UserId
     {
         return $this->id;
+    }
+
+    public function name(): string
+    {
+        return $this->name;
     }
 
     public function email(): UserEmail

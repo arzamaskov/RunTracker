@@ -12,12 +12,8 @@ use RunTracker\Identity\Domain\Ports\UserFactoryInterface;
 
 class UserFactory implements UserFactoryInterface
 {
-    public function create(UserEmail $email, string $plainPassword): User
+    public function create(UserEmail $email, string $name, string $plainPassword): User
     {
-        return new User(
-            new UserId,
-            $email,
-            Hash::make($plainPassword)
-        );
+        return new User(new UserId, $email, $name, Hash::make($plainPassword));
     }
 }
