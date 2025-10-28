@@ -9,5 +9,5 @@ use RunTracker\Identity\Domain\Model\UserEmail;
 
 interface UserFactoryInterface
 {
-    public function create(UserEmail $email, string $plainPassword): User;
+    public function create(UserEmail $email, string $name, string $plainPassword): User;
 }
