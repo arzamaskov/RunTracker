@@ -14,7 +14,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/arzamaskov/run-app
+  IMAGE_NAME: ghcr.io/arzamaskov/runtracker
   DOCKER_BUILDKIT: "1"
 
 jobs:
