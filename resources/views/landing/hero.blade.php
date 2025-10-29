@@ -18,7 +18,7 @@
                 </div>
 
                 <p class="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
-                    42 километра — это марафон. <strong class="text-slate-900">42к.рф</strong> — минималистичное приложение для учёта тренировок и аналитики бега. Готовьтесь к цели осознанно.
+                    <strong class="text-slate-900">RunTracker</strong> — минималистичное приложение для учёта тренировок и аналитики бега. Готовьтесь к цели осознанно.
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-4">

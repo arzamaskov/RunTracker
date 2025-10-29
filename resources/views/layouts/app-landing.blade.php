@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>42к.рф — Бегайте умнее. Растите стабильнее</title>
-    <meta name="description" content="42к.рф — минималистичное приложение для учёта тренировок и аналитики бега. Готовьтесь к марафону осознанно.">
+    <title>RunTracker — Бегайте умнее. Растите стабильнее</title>
+    <meta name="description" content="RunTracker — минималистичное приложение для учёта тренировок и аналитики бега. Готовьтесь к марафону осознанно.">
 
-    <meta property="og:title" content="42к.рф — Бегайте умнее. Растите стабильнее">
+    <meta property="og:title" content="RunTracker — Бегайте умнее. Растите стабильнее">
     <meta property="og:description" content="Минималистичное приложение для учёта тренировок и аналитики бега">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
@@ -41,7 +41,7 @@
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center space-x-8">
                 <a href="/" class="text-xl font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded">
-                    42к.рф
+                    RunTracker
                 </a>
 
                 <nav class="hidden md:flex space-x-2" aria-label="Главная навигация">
@@ -104,7 +104,7 @@
     <div class="max-w-6xl mx-auto px-4 py-12">
         <div class="grid md:grid-cols-3 gap-8">
             <div>
-                <div class="text-lg font-semibold text-slate-900 mb-2">42к.рф</div>
+                <div class="text-lg font-semibold text-slate-900 mb-2">RunTracker</div>
                 <p class="text-sm text-slate-600">
                     Бегайте умнее. Растите стабильнее
                 </p>
@@ -128,7 +128,7 @@
 
         <div class="mt-8 pt-8 border-t border-slate-200 text-center">
             <p class="text-sm text-slate-500">
-                © {{ date('Y') }} 42к.рф. Все права защищены.
+                © {{ date('Y') }} RunTracker. Все права защищены.
             </p>
         </div>
     </div>
