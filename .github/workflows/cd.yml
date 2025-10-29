@@ -221,6 +221,7 @@ jobs:
             IMAGE_NAME="$IMAGE_NAME" APP_TAG="$APP_TAG" WEB_TAG="$WEB_TAG" docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker compose -f docker-compose.prod.yml ps
 
+            # Мейнтенанс/миграции/кэш
             docker compose -f docker-compose.prod.yml exec -T app php artisan down || true
             docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
             docker compose -f docker-compose.prod.yml exec -T app php artisan optimize:clear
