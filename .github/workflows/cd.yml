@@ -85,8 +85,14 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+
+      # multi-arch на будущее (можно удалить, если не нужно)
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -94,7 +100,7 @@ jobs:
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      # Нормализуем тег релиза для docker
+      # Безопасный тег (на случай "грязных" символов в git tag)
       - name: Compute SAFE_TAG
         if: startsWith(github.ref, 'refs/tags/')
         id: tag
@@ -113,12 +119,15 @@ jobs:
           file: docker/production/Dockerfile
           target: prod
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha,scope=app
           cache-to: type=gha,mode=max,scope=app
           tags: ${{ env.IMAGE_NAME }}:app-${{ github.sha }}
 
-      # APP: на тегах пушим :version(safe) и :latest
+      - name: Verify APP :sha exists
+        run: docker buildx imagetools inspect ${{ env.IMAGE_NAME }}:app-${{ github.sha }}
+
+      # APP: на тегах пушим :version-safe и :latest
       - name: Build & push APP (:version-safe, :latest)
         if: startsWith(github.ref, 'refs/tags/')
         uses: docker/build-push-action@v6
@@ -127,7 +136,7 @@ jobs:
           file: docker/production/Dockerfile
           target: prod
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha,scope=app
           cache-to: type=gha,mode=max,scope=app
           tags: |
@@ -142,12 +151,15 @@ jobs:
           file: docker/production/Dockerfile
           target: web
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
           tags: ${{ env.IMAGE_NAME }}:web-${{ github.sha }}
 
-      # WEB: на тегах пушим :version(safe) и :latest
+      - name: Verify WEB :sha exists
+        run: docker buildx imagetools inspect ${{ env.IMAGE_NAME }}:web-${{ github.sha }}
+
+      # WEB: на тегах пушим :version-safe и :latest
       - name: Build & push WEB (:version-safe, :latest)
         if: startsWith(github.ref, 'refs/tags/')
         uses: docker/build-push-action@v6
@@ -156,7 +168,7 @@ jobs:
           file: docker/production/Dockerfile
           target: web
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
           tags: |
@@ -178,34 +190,35 @@ jobs:
           username: ${{ secrets.PROD_SSH_USER }}
           key:      ${{ secrets.PROD_SSH_KEY }}
           command_timeout: 20m
-          envs: GITHUB_SHA,GITHUB_REF_NAME
+          envs: GITHUB_SHA,IMAGE_NAME
           script: |
             set -euo pipefail
             cd /opt/run-app
 
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
 
-            # ===== Основной режим: деплоим immutable-образами по SHA =====
+            # ЕДИНЫЙ путь к образам, как в build
+            export IMAGE_NAME="${IMAGE_NAME:-ghcr.io/arzamaskov/runtracker}"
+
+            # Деплой immutable-образами по SHA
             export APP_TAG="${GITHUB_SHA}"
             export WEB_TAG="${GITHUB_SHA}"
 
-            APP_IMAGE_SHA="ghcr.io/arzamaskov/runtracker:app-${APP_TAG}"
-            WEB_IMAGE_SHA="ghcr.io/arzamaskov/runtracker:web-${WEB_TAG}"
+            APP_IMAGE="${IMAGE_NAME}:app-${APP_TAG}"
+            WEB_IMAGE="${IMAGE_NAME}:web-${WEB_TAG}"
             echo "Deploy by SHA:"
-            echo "  $APP_IMAGE_SHA"
-            echo "  $WEB_IMAGE_SHA"
+            echo "  $APP_IMAGE"
+            echo "  $WEB_IMAGE"
 
-            # Preflight: удостоверимся, что такие теги есть
-            docker manifest inspect "$APP_IMAGE_SHA" >/dev/null || { echo "MISSING: $APP_IMAGE_SHA"; exit 1; }
-            docker manifest inspect "$WEB_IMAGE_SHA" >/dev/null || { echo "MISSING: $WEB_IMAGE_SHA"; exit 1; }
+            # Preflight: убедимся, что образы есть в GHCR
+            docker manifest inspect "$APP_IMAGE" >/dev/null || { echo "MISSING: $APP_IMAGE"; exit 1; }
+            docker manifest inspect "$WEB_IMAGE" >/dev/null || { echo "MISSING: $WEB_IMAGE"; exit 1; }
 
-            # На всякий случай валидируем compose
             docker compose -f docker-compose.prod.yml config -q
 
-            # Останавливаем старые контейнеры и поднимаем новые
             docker compose -f docker-compose.prod.yml down || true
-            APP_TAG="$APP_TAG" WEB_TAG="$WEB_TAG" docker compose -f docker-compose.prod.yml pull
-            APP_TAG="$APP_TAG" WEB_TAG="$WEB_TAG" docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            IMAGE_NAME="$IMAGE_NAME" APP_TAG="$APP_TAG" WEB_TAG="$WEB_TAG" docker compose -f docker-compose.prod.yml pull
+            IMAGE_NAME="$IMAGE_NAME" APP_TAG="$APP_TAG" WEB_TAG="$WEB_TAG" docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker compose -f docker-compose.prod.yml ps
 
             # Мейнтенанс/миграции/кэш
@@ -219,4 +232,3 @@ jobs:
             docker compose -f docker-compose.prod.yml exec -T app php artisan up
 
             docker image prune -f
-
