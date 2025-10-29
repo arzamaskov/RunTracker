@@ -84,8 +84,8 @@ jobs:
     needs: [tests]
     timeout-minutes: 30
     env:
-      CACHE_APP: ${{ env.IMAGE_NAME }}:cache-app
-      CACHE_WEB: ${{ env.IMAGE_NAME }}:cache-web
+      CACHE_APP: ghcr.io/arzamaskov/runtracker:cache-app
+      CACHE_WEB: ghcr.io/arzamaskov/runtracker:cache-web
     steps:
       - uses: actions/checkout@v4
 
