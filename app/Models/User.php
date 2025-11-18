@@ -3,14 +3,30 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
+use Symfony\Component\Uid\Uuid;
 
+/**
+ * @property Uuid $id
+ * @property string $email
+ * @property string $password
+ * @property-read Carbon|null $created_at
+ * @property-read Carbon|null $updated_at
+ */
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    public $incrementing = false;
+
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $table = 'identity.users';
+
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -18,7 +34,6 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
     ];
