@@ -70,12 +70,14 @@ FROM node:22-alpine AS assets
 WORKDIR /app
 
 # Кешируем node-зависимости
-COPY package*.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+# Включаем corepack и используем pnpm
+RUN corepack enable \
+    && pnpm install --frozen-lockfile
 
 # Копируем код и собираем фронтенд
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 # Результат: /app/public/build
 
@@ -86,8 +88,8 @@ FROM base AS prod
 
 WORKDIR /var/www/html
 
-# Настройка PHP для production
-COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
+# Настройка PHP для production (отдельный prod ini)
+COPY docker/php-fpm/php.prod.ini /usr/local/etc/php/conf.d/custom.ini
 
 # 1) Кеш Composer зависимостей
 COPY composer.json composer.lock ./
@@ -111,6 +113,8 @@ RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoload
 
 # config:cache/route:cache запускаем на деплое, когда есть ENV
 EXPOSE 9000
+# Запуск под непривилегированным пользователем
+USER www-data
 CMD ["php-fpm"]
 
 # ========================
@@ -125,4 +129,3 @@ COPY --from=prod /var/www/html/public ./public
 
 # Копируем nginx конфиг для Laravel
 COPY docker/nginx/production.conf /etc/nginx/conf.d/default.conf
-
