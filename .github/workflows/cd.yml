@@ -56,13 +56,16 @@ jobs:
             composer-${{ runner.os }}-
       - name: Composer install
         run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
       - name: Install pnpm dependencies
-        run: corepack enable && pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Build frontend
         run: pnpm run build
       - name: App key for tests
