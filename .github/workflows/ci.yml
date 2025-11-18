@@ -27,6 +27,26 @@ jobs:
       - name: Pint --test
         run: vendor/bin/pint --test || true
 
+  deptrac:
+    name: deptrac
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, intl
+      - name: Install deps (no scripts)
+        run: composer install --no-interaction --no-progress --prefer-dist --no-scripts --no-plugins
+      - name: Deptrac
+        run: |
+          if [ -x vendor/bin/deptrac ]; then
+            vendor/bin/deptrac analyse || true
+          else
+            echo "deptrac not installed, skipping"
+          fi
+
   static-analysis:
     name: static-analysis
     runs-on: ubuntu-latest
