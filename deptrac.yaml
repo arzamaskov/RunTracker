@@ -1,0 +1,26 @@
+deptrac:
+  paths:
+    - app
+#    - src
+
+  # Можно исключить vendor на всякий случай
+  exclude_files:
+    - '#^vendor/.*#'
+
+  layers:
+    - name: LaravelHost
+      collectors:
+        - type: directory
+          value: /app/\w+/.*
+
+    - name: Core
+      collectors:
+        - type: directory
+          value: /src/\w+/.*
+
+  ruleset:
+    # Пока только одно базовое правило:
+    # хост (Laravel) может зависеть от Core, но не наоборот
+    Core: []
+    LaravelHost:
+      - Core
