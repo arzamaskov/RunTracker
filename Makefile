@@ -1,4 +1,11 @@
-.PHONY: help build up down restart logs shell composer npm artisan migrate fresh seed test
+.PHONY: help build up down restart logs shell composer pnpm artisan migrate fresh seed test \
+        lint stan psql backup-db restore-db test-db-create test-db-drop ci permissions \
+        clean install fresh-install volumes ps info tinker
+.DEFAULT_GOAL := help
+
+# =============================================================================
+# Переменные и настройки
+# =============================================================================
 
 # Цвета для вывода
 GREEN  := \033[0;32m
@@ -18,9 +25,24 @@ DC := docker compose
 DC_EXEC := $(DC) exec $(EXEC_USER)
 DC_EXEC_ROOT := $(DC) exec -u root
 
+# PostgreSQL
+DB_USERNAME := laravel
+DB_PASSWORD := secret
+DB_DATABASE := runtracker
+DB_DATABASE_TEST := $(DB_DATABASE)_test
+PROJECT := $(shell basename "$(CURDIR)" | tr '[:upper:]' '[:lower:]')
+
+# =============================================================================
+# Справка
+# =============================================================================
+
 help: ## Показать эту справку
 	@echo "$(GREEN)Доступные команды:$(NC)"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-15s$(NC) %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-20s$(NC) %s\n", $$1, $$2}'
+
+# =============================================================================
+# Docker Compose - управление контейнерами
+# =============================================================================
 
 build: ## Собрать Docker образы
 	$(DC) build --no-cache
@@ -34,6 +56,16 @@ down: ## Остановить все контейнеры
 restart: ## Перезапустить все контейнеры
 	$(DC) restart
 
+shell: ## Подключиться к контейнеру PHP (от пользователя laravel)
+	$(DC_EXEC) php-fpm sh
+
+shell-root: ## Подключиться к контейнеру PHP от root
+	$(DC_EXEC_ROOT) php-fpm sh
+
+# =============================================================================
+# Логи
+# =============================================================================
+
 logs: ## Показать логи всех контейнеров
 	$(DC) logs -f
 
@@ -41,99 +73,130 @@ logs-nginx: ## Показать логи Nginx
 	$(DC) logs -f nginx
 
 logs-php: ## Показать логи PHP
-	$(DC) logs -f php
+	$(DC) logs -f php-fpm
 
-logs-mysql: ## Показать логи MySQL
-	$(DC) logs -f mysql
+logs-postgres: ## Показать логи PostgreSQL
+	$(DC) logs -f postgres
 
-shell: ## Подключиться к контейнеру PHP (от пользователя laravel)
-	$(DC_EXEC) php sh
+postgres-logs: ## Показать логи PostgreSQL
+	$(DC) logs -f postgres
 
-shell-root: ## Подключиться к контейнеру PHP от root
-	$(DC_EXEC_ROOT) php sh
+# =============================================================================
+# Подключения к сервисам
+# =============================================================================
 
-mysql: ## Подключиться к MySQL консоли
-	$(DC) exec mysql mysql -uroot -p
+psql: ## Подключиться к PostgreSQL консоли
+	$(DC) exec postgres psql -U $(DB_USERNAME) -d $(DB_DATABASE)
 
-mysql-slow-log: ## Показать slow query log (последние 100 строк)
-	@echo "$(GREEN)Slow query log (последние 100 строк):$(NC)"
-	@$(DC) exec mysql tail -100 /var/log/mysql/slow-query.log || echo "Лог пуст или не настроен"
-
-mysql-slow-analyze: ## Анализ медленных запросов (топ 10)
-	@echo "$(GREEN)Топ 10 самых медленных запросов:$(NC)"
-	@$(DC) exec mysql mysqldumpslow -s t -t 10 /var/log/mysql/slow-query.log 2>/dev/null || echo "Нет данных или mysqldumpslow не установлен"
-
-mysql-slow-clear: ## Очистить slow query log
-	@echo "$(YELLOW)⚠️  Очистка slow query log...$(NC)"
-	@$(DC) exec mysql mysql -u root -p$(DB_ROOT_PASSWORD:-root) -e "FLUSH SLOW LOGS;" 2>/dev/null || true
-	@$(DC) exec mysql sh -c "truncate -s 0 /var/log/mysql/slow-query.log 2>/dev/null" || true
-	@echo "$(GREEN)✅ Лог очищен$(NC)"
+psql-root: ## Подключиться к PostgreSQL от суперпользователя
+	$(DC) exec postgres psql -U postgres
 
 redis-cli: ## Подключиться к Redis консоли
 	$(DC) exec redis redis-cli
 
+# =============================================================================
+# Composer - управление PHP зависимостями
+# =============================================================================
+
 composer: ## Выполнить Composer команду (make composer CMD="install")
-	$(DC_EXEC) php composer $(CMD)
+	$(DC_EXEC) php-fpm composer $(CMD)
 
 composer-install: ## Установить PHP зависимости
-	$(DC_EXEC) php composer install
+	$(DC_EXEC) php-fpm composer install
 
 composer-update: ## Обновить PHP зависимости
-	$(DC_EXEC) php composer update
+	$(DC_EXEC) php-fpm composer update
 
 composer-require: ## Установить пакет (make composer-require PKG="vendor/package")
-	$(DC_EXEC) php composer require $(PKG)
+	$(DC_EXEC) php-fpm composer require $(PKG)
 
 composer-dump: ## Обновить autoload
-	$(DC_EXEC) php composer dump-autoload
+	$(DC_EXEC) php-fpm composer dump-autoload
 
-npm: ## Выполнить NPM команду (make npm CMD="install")
-	$(DC) exec node npm $(CMD)
+# =============================================================================
+# PNPM - управление фронтенд зависимостями
+# =============================================================================
 
-npm-install: ## Установить Node зависимости
-	$(DC) exec node npm install
+pnpm: ## Выполнить PNPM команду (make pnpm CMD="install")
+	$(DC) exec node sh -lc 'corepack enable && pnpm $(CMD)'
 
-npm-dev: ## Запустить Vite в режиме разработки
-	$(DC) exec node npm run dev
+pnpm-install: ## Установить Node зависимости
+	$(DC) exec node sh -lc 'corepack enable && pnpm install'
 
-npm-build: ## Собрать production версию фронтенда
-	$(DC) exec node npm run build
+pnpm-dev: ## Запустить Vite в режиме разработки
+	$(DC) exec node sh -lc 'corepack enable && pnpm run dev'
 
-npm-watch: ## Запустить watch mode
-	$(DC) exec node npm run watch
+pnpm-build: ## Собрать production версию фронтенда
+	$(DC) exec node sh -lc 'corepack enable && pnpm run build'
+
+pnpm-watch: ## Запустить watch mode
+	$(DC) exec node sh -lc 'corepack enable && pnpm run watch'
+
+# =============================================================================
+# Artisan - Laravel команды
+# =============================================================================
 
 artisan: ## Выполнить Artisan команду (make artisan CMD="migrate")
-	$(DC_EXEC) php php artisan $(CMD)
+	$(DC_EXEC) php-fpm php artisan $(CMD)
+
+# =============================================================================
+# Миграции и сидеры
+# =============================================================================
 
 migrate: ## Запустить миграции
-	$(DC_EXEC) php php artisan migrate
+	$(DC_EXEC) php-fpm php artisan migrate
 
 migrate-rollback: ## Откатить последнюю миграцию
-	$(DC_EXEC) php php artisan migrate:rollback
+	$(DC_EXEC) php-fpm php artisan migrate:rollback
 
 migrate-fresh: ## Пересоздать базу данных и запустить миграции
-	$(DC_EXEC) php php artisan migrate:fresh
+	$(DC_EXEC) php-fpm php artisan migrate:fresh
 
 migrate-fresh-seed: ## Пересоздать базу данных, запустить миграции и сидеры
-	$(DC_EXEC) php php artisan migrate:fresh --seed
+	$(DC_EXEC) php-fpm php artisan migrate:fresh --seed
 
 seed: ## Запустить сидеры
-	$(DC_EXEC) php php artisan db:seed
+	$(DC_EXEC) php-fpm php artisan db:seed
+
+# =============================================================================
+# Тестирование
+# =============================================================================
 
 test: ## Запустить тесты
-	$(DC_EXEC) php php artisan test
+	$(DC_EXEC) php-fpm php artisan test
 
 test-coverage: ## Запустить тесты с покрытием
-	$(DC_EXEC) php php artisan test --coverage
+	$(DC_EXEC) php-fpm php artisan test --coverage
 
 test-filter: ## Запустить конкретный тест (make test-filter FILTER="TestName")
 	$(DC_EXEC) php php artisan test --filter=$(FILTER)
 
+test-db-create: ## Создать тестовую базу данных
+	@echo "$(GREEN)Создание тестовой базы данных...$(NC)"
+	$(DC) exec postgres psql -U $(DB_USERNAME) -d postgres -c "CREATE DATABASE $(DB_DATABASE_TEST);" || echo "База уже существует"
+	@echo "$(GREEN)✅ Тестовая БД создана$(NC)"
+
+test-db-drop: ## Удалить тестовую базу данных
+	@echo "$(YELLOW)⚠️  Удаление тестовой базы данных...$(NC)"
+	$(DC) exec postgres psql -U $(DB_USERNAME) -d postgres -c "DROP DATABASE IF EXISTS $(DB_DATABASE_TEST);"
+	@echo "$(GREEN)✅ Тестовая БД удалена$(NC)"
+
+test-db-reset: ## Пересоздать тестовую БД с миграциями
+	@echo "$(GREEN)Пересоздание тестовой базы данных...$(NC)"
+	@make test-db-drop
+	@make test-db-create
+	$(DC_EXEC) php-fpm php artisan migrate --database=pgsql --env=testing
+	@echo "$(GREEN)✅ Тестовая БД готова$(NC)"
+
+# =============================================================================
+# Качество кода
+# =============================================================================
+
 lint: ## Проверить код на соответствие стандартам (Laravel Pint)
-	$(DC_EXEC) php ./vendor/bin/pint --test
+	$(DC_EXEC) php-fpm ./vendor/bin/pint --test
 
 lint-fix: ## Автоматически исправить стиль кода (Laravel Pint)
-	$(DC_EXEC) php ./vendor/bin/pint
+	$(DC_EXEC) php-fpm ./vendor/bin/pint
 
 pint: lint ## Алиас для lint
 
@@ -142,56 +205,79 @@ pint-fix: lint-fix ## Алиас для lint-fix
 phpcs: lint ## Алиас для lint (совместимость)
 
 stan: ## Запустить статический анализ кода (PHPStan)
-	$(DC_EXEC) php ./vendor/bin/phpstan analyse --memory-limit=2G
+	$(DC_EXEC) php-fpm ./vendor/bin/phpstan analyse --memory-limit=2G
 
 phpstan: stan ## Алиас для stan
 
-ci: lint stan test ## Комбо для локальной проверки перед git push
+deptrac: ## Запустить проверку на соответствие архитектурным правилам (Deptrac)
+	$(DC_EXEC) php-fpm ./vendor/bin/deptrac analyse
+
+ci: lint deptrac stan test ## Комбо для локальной проверки перед git push
+
+# =============================================================================
+# Кеш и оптимизация
+# =============================================================================
 
 cache-clear: ## Очистить все кеши
-	$(DC_EXEC) php php artisan cache:clear
-	$(DC_EXEC) php php artisan config:clear
-	$(DC_EXEC) php php artisan route:clear
-	$(DC_EXEC) php php artisan view:clear
+	$(DC_EXEC) php-fpm php artisan cache:clear
+	$(DC_EXEC) php-fpm php artisan config:clear
+	$(DC_EXEC) php-fpm php artisan route:clear
+	$(DC_EXEC) php-fpm php artisan view:clear
 
 optimize: ## Оптимизировать приложение
-	$(DC_EXEC) php php artisan config:cache
-	$(DC_EXEC) php php artisan route:cache
-	$(DC_EXEC) php php artisan view:cache
+	$(DC_EXEC) php-fpm php artisan config:cache
+	$(DC_EXEC) php-fpm php artisan route:cache
+	$(DC_EXEC) php-fpm php artisan view:cache
 
 optimize-clear: ## Очистить оптимизацию
-	$(DC_EXEC) php php artisan optimize:clear
+	$(DC_EXEC) php-fpm php artisan optimize:clear
+
+# =============================================================================
+# Laravel утилиты
+# =============================================================================
 
 key-generate: ## Сгенерировать ключ приложения
-	$(DC_EXEC) php php artisan key:generate
+	$(DC_EXEC) php-fpm php artisan key:generate
 
 storage-link: ## Создать симлинк для storage
-	$(DC_EXEC) php php artisan storage:link
+	$(DC_EXEC) php-fpm php artisan storage:link
 
 queue-work: ## Запустить обработку очередей
-	$(DC_EXEC) php php artisan queue:work
+	$(DC_EXEC) php-fpm php artisan queue:work
 
 queue-listen: ## Запустить прослушивание очередей
-	$(DC_EXEC) php php artisan queue:listen
+	$(DC_EXEC) php-fpm php artisan queue:listen
 
 queue-restart: ## Перезапустить queue workers
-	$(DC_EXEC) php php artisan queue:restart
+	$(DC_EXEC) php-fpm php artisan queue:restart
 
 tinker: ## Запустить Tinker REPL
-	$(DC_EXEC) php php artisan tinker
+	$(DC_EXEC) php-fpm php artisan tinker
+
+# =============================================================================
+# Права доступа
+# =============================================================================
 
 permissions: ## Установить права доступа (выполняется от root)
-	$(DC_EXEC_ROOT) php chown -R $(USER_ID):$(GROUP_ID) /var/www/html
-	$(DC_EXEC_ROOT) php chmod -R 755 /var/www/html/storage
-	$(DC_EXEC_ROOT) php chmod -R 755 /var/www/html/bootstrap/cache
+	$(DC_EXEC_ROOT) php-fpm chown -R $(USER_ID):$(GROUP_ID) /var/www/html
+	$(DC_EXEC_ROOT) php-fpm chmod -R 755 /var/www/html/storage
+	$(DC_EXEC_ROOT) php-fpm chmod -R 755 /var/www/html/bootstrap/cache
 
 permissions-fix: ## Исправить права доступа для storage и cache
-	$(DC_EXEC_ROOT) php chown -R $(USER_ID):$(GROUP_ID) /var/www/html/storage /var/www/html/bootstrap/cache
-	$(DC_EXEC_ROOT) php chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+	$(DC_EXEC_ROOT) php-fpm chown -R $(USER_ID):$(GROUP_ID) /var/www/html/storage /var/www/html/bootstrap/cache
+	$(DC_EXEC_ROOT) php-fpm chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-install: build up composer-install npm-install key-generate migrate storage-link permissions ## Полная установка проекта
+# =============================================================================
+# Установка проекта
+# =============================================================================
 
-fresh-install: build up composer-install npm-install key-generate migrate-fresh-seed storage-link permissions ## Полная установка с пересозданием БД
+install: build up composer-install pnpm-install key-generate migrate storage-link permissions ## Полная установка проекта
+
+fresh-install: build up composer-install pnpm-install key-generate migrate-fresh-seed storage-link permissions ## Полная установка с пересозданием БД
+
+# =============================================================================
+# Очистка
+# =============================================================================
 
 clean: down ## ⚠️  Удалить все контейнеры и volumes (УДАЛЯЕТ БД!)
 	@echo "$(YELLOW)⚠️  ВНИМАНИЕ: Эта команда удалит ВСЕ ДАННЫЕ включая БД!$(NC)"
@@ -207,10 +293,14 @@ clean-all: ## ⚠️  Удалить всё включая образы (УДА�
 	$(DC) down -v --rmi all
 	docker system prune -af
 
+# =============================================================================
+# База данных - управление
+# =============================================================================
+
 backup-db: ## Создать бэкап базы данных
 	@mkdir -p ./backups
 	@echo "$(GREEN)Создание бэкапа БД...$(NC)"
-	$(DC) exec -T mysql mysqldump -u root -p$(DB_ROOT_PASSWORD:-root) $(DB_DATABASE:-l42k) | gzip > ./backups/backup_$(shell date +%Y%m%d_%H%M%S).sql.gz
+	$(DC) exec -T postgres pg_dump -U $(DB_USERNAME) $(DB_DATABASE) | gzip > ./backups/backup_$(shell date +%Y%m%d_%H%M%S).sql.gz
 	@echo "$(GREEN)✅ Бэкап создан в ./backups/$(NC)"
 
 restore-db: ## Восстановить БД из бэкапа (make restore-db FILE=backup.sql.gz)
@@ -222,15 +312,45 @@ restore-db: ## Восстановить БД из бэкапа (make restore-db 
 	@echo "$(YELLOW)Нажмите Ctrl+C для отмены или Enter для продолжения...$(NC)"
 	@read confirm
 	@echo "$(GREEN)Восстановление БД из $(FILE)...$(NC)"
-	@gunzip < $(FILE) | $(DC) exec -T mysql mysql -u root -p$(DB_ROOT_PASSWORD:-root) $(DB_DATABASE:-l42k)
+	@gunzip < $(FILE) | $(DC) exec -T postgres psql -U $(DB_USERNAME) -d $(DB_DATABASE)
 	@echo "$(GREEN)✅ БД восстановлена$(NC)"
+
+db-list: ## Показать список всех баз данных
+	@echo "$(GREEN)Список баз данных:$(NC)"
+	$(DC) exec postgres psql -U $(DB_USERNAME) -d postgres -c "\l"
+
+db-reset: ## ⚠️ Полностью пересоздать основную БД
+	@echo "$(YELLOW)⚠️  ВНИМАНИЕ: Все данные БД будут удалены!$(NC)"
+	@echo "$(YELLOW)Нажмите Ctrl+C для отмены или Enter для продолжения...$(NC)"
+	@read confirm
+	$(DC_EXEC) php-fpm php artisan migrate:fresh --seed
+	@echo "$(GREEN)✅ БД пересоздана$(NC)"
+
+db-schema: ## Показать структуру таблиц основной БД
+	@echo "$(GREEN)Структура таблиц:$(NC)"
+	$(DC) exec postgres psql -U $(DB_USERNAME) -d $(DB_DATABASE) -c "\dt"
+
+db-schema-test: ## Показать структуру таблиц тестовой БД
+	@echo "$(GREEN)Структура таблиц тестовой БД:$(NC)"
+	$(DC) exec postgres psql -U $(DB_USERNAME) -d $(DB_DATABASE_TEST) -c "\dt"
+
+# =============================================================================
+# Информация и мониторинг
+# =============================================================================
 
 volumes: ## Показать информацию о volumes
 	@echo "$(GREEN)Docker volumes проекта:$(NC)"
-	@docker volume ls | grep l42k || echo "Volumes не найдены"
+	@docker volume ls | grep '$(PROJECT)_' || echo "Volumes не найдены"
 	@echo ""
 	@echo "$(GREEN)Размер volumes:$(NC)"
-	@docker system df -v | grep l42k || echo "Volumes не найдены"
+	@docker system df -v | grep '$(PROJECT)_' || echo "Volumes не найдены"
+
+check: ## Проверить, что все контейнеры запущены
+	@echo "$(GREEN)Проверка контейнеров...$(NC)"
+	@$(DC) ps
+	@echo ""
+	@echo "$(GREEN)Проверка подключения к БД...$(NC)"
+	@$(DC) exec postgres pg_isready -U $(DB_USERNAME) || echo "$(YELLOW)⚠️ PostgreSQL не готов!$(NC)"
 
 ps: ## Показать статус контейнеров
 	$(DC) ps
@@ -247,11 +367,10 @@ info: ## Показать информацию о проекте
 	@echo "  GROUP_ID: $(GROUP_ID)"
 	@echo ""
 	@echo "$(GREEN)Версии:$(NC)"
-	@$(DC_EXEC) php php -v | head -n 1
-	@$(DC_EXEC) php composer --version
-	@$(DC) exec node node -v
-	@$(DC) exec node npm -v
+	@printf "  PHP:     " && $(DC_EXEC) php-fpm php -v | head -n 1
+	@printf "  Composer: " && $(DC_EXEC) php-fpm composer --version 2>/dev/null | head -n 1
+	@printf "  Node.js: " && $(DC) exec node node -v
+	@printf "  pnpm:    " && $(DC) exec node sh -lc 'corepack enable && pnpm -v'
 	@echo ""
 	@echo "$(GREEN)Laravel:$(NC)"
-	@$(DC_EXEC) php php artisan --version
-
+	@printf "  " && $(DC_EXEC) php-fpm php artisan --version

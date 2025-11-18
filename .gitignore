@@ -13,6 +13,7 @@ Thumbs.db
 junit.xml
 coverage/
 clover.xml
+.deptrac.cache
 
 # === Environment & secrets ===
 .env
@@ -36,6 +37,7 @@ auth.json
 # === Dependencies ===
 /vendor/
 /node_modules/
+/.pnpm-store/
 
 # === Laravel build/runtime artifacts ===
 /public/build/
@@ -51,8 +53,10 @@ auth.json
 
 # === Docker / Sail (локальные переопределения) ===
 docker-compose.override.yml
+# Production compose (хранится только на сервере)
+docker-compose.prod.yml
 
-# === Homestead (если вдруг используешь) ===
+# === Homestead ===
 Homestead.json
 Homestead.yaml
 
@@ -65,4 +69,3 @@ yarn-error.log
 *.sql
 *.sql.gz
 *_backup.tar.gz
-

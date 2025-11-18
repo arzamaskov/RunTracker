@@ -2,7 +2,6 @@ services:
   # Nginx веб-сервер
   nginx:
     image: nginx:1.28-alpine
-    container_name: 42k_nginx
     ports:
       - "80:80"
       - "443:443"
@@ -10,99 +9,81 @@ services:
       - ./:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - php
-    networks:
-      - 42k_network
-    restart: unless-stopped
+      - php-fpm
+    # healthcheck disabled in dev
 
   # PHP-FPM
-  php:
+  php-fpm:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile
-    container_name: 42k_php
+      dockerfile: docker/php-fpm/Dockerfile
     volumes:
       - ./:/var/www/html
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-run_app}
+      - DB_DATABASE=${DB_DATABASE:-runtracker}
       - DB_USERNAME=${DB_USERNAME:-laravel}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - PHP_IDE_CONFIG=serverName=localhost
     depends_on:
       - postgres
       - redis
-    networks:
-      - 42k_network
-    restart: unless-stopped
+    # healthcheck disabled in dev
 
   # PostgreSQL база данных
   postgres:
     image: postgres:16-alpine
-    container_name: 42k_postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=${DB_DATABASE:-run_app}
+      - POSTGRES_DB=runtracker
       - POSTGRES_USER=${DB_USERNAME:-laravel}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-secret}
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-laravel}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - 42k_network
-    restart: unless-stopped
+    # healthcheck disabled in dev
+    # no restart in dev to surface errors
 
   # Redis для кеширования и очередей
   redis:
     image: redis:7.4-alpine
-    container_name: 42k_redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
-    networks:
-      - 42k_network
-    restart: unless-stopped
+    # healthcheck disabled in dev
 
-  # Node.js для сборки фронтенда (Vite + Tailwind)
+  # Node.js для разработки (Vite + Tailwind)
   node:
     image: node:22-alpine
-    container_name: 42k_node
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
-    command: sh -c "npm install && npm run dev"
+      - pnpm_store:/pnpm-store
+    environment:
+      - PNPM_STORE_DIR=/pnpm-store
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_HOST=0.0.0.0
+      - HOST=0.0.0.0
+    command: sh -c "corepack enable && pnpm install && ./node_modules/.bin/vite --host 0.0.0.0"
     ports:
       - "5173:5173"
-    networks:
-      - 42k_network
-    restart: unless-stopped
+    # healthcheck disabled in dev
 
-  # Mailpit для тестирования email (альтернатива MailHog)
+  # Mailpit для тестирования email (SMTP/Web UI)
   mailpit:
     image: axllent/mailpit:latest
-    container_name: 42k_mailpit
     ports:
       - "8025:8025"
       - "1025:1025"
-    networks:
-      - 42k_network
-    restart: unless-stopped
-
-networks:
-  42k_network:
-    driver: bridge
 
 volumes:
   postgres_data:
     driver: local
   redis_data:
     driver: local
-
+  pnpm_store:
+    driver: local
