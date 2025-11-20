@@ -1,117 +1,129 @@
-<section id="pricing" class="py-20 md:py-24 bg-white">
-    <div class="max-w-6xl mx-auto px-4">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                Прозрачные тарифы
+<section id="pricing" class="py-24 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+                Простые тарифы
             </h2>
             <p class="text-lg text-slate-600 max-w-2xl mx-auto">
-                Начните бесплатно, переходите на Pro когда понадобится больше
+                Честные условия. Никаких скрытых платежей.
             </p>
         </div>
 
         <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div class="border-2 border-slate-200 rounded-xl p-8 hover:border-blue-300 transition">
-                <div class="mb-6">
-                    <h3 class="text-2xl font-bold text-slate-900 mb-2">
-                        Бесплатно
-                    </h3>
-                    <div class="text-4xl font-bold text-slate-900 mb-4">
-                        0 ₽
-                        <span class="text-lg font-normal text-slate-500">/месяц</span>
+            <!-- Free Plan -->
+            <div
+                class="relative p-8 rounded-3xl border border-slate-200 bg-white hover:border-slate-300 transition-colors">
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Старт</h3>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-4xl font-bold text-slate-900">0 ₽</span>
+                        <span class="text-slate-500">/месяц</span>
                     </div>
-                    <p class="text-slate-600">
-                        Всё базовое для личного учёта
-                    </p>
+                    <p class="mt-4 text-slate-600">Идеально для начала пути и ведения базового дневника.</p>
                 </div>
 
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start text-slate-700">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">До 100 тренировок</span>
+                        До 100 тренировок
                     </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    <li class="flex items-start text-slate-700">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">Базовая аналитика</span>
+                        Базовая аналитика
                     </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    <li class="flex items-start text-slate-700">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">Экспорт данных в CSV</span>
+                        Экспорт в CSV
                     </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    <li class="flex items-start text-slate-700">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">Мобильная версия</span>
+                        Мобильная версия
                     </li>
                 </ul>
 
-                <a href="#signup" class="block w-full px-6 py-3 text-center border-2 border-slate-300 text-slate-700 font-medium rounded-lg hover:border-slate-400 hover:bg-slate-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
+                <a href="#register"
+                    class="block w-full py-3 px-6 text-center rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2">
                     Начать бесплатно
                 </a>
             </div>
 
-            <div class="border-2 border-blue-600 rounded-xl p-8 relative bg-gradient-to-b from-blue-50/30 to-white">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span class="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded-full" aria-label="Тариф скоро доступен">
-                        Скоро
-                    </span>
+            <!-- Pro Plan -->
+            <div class="relative p-8 rounded-3xl border-2 border-primary-500 bg-slate-50/50 overflow-hidden">
+                <div class="absolute top-0 right-0 bg-primary-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+                    РЕКОМЕНДУЕМ
                 </div>
 
-                <div class="mb-6">
-                    <h3 class="text-2xl font-bold text-slate-900 mb-2">
-                        Pro
-                    </h3>
-                    <div class="text-4xl font-bold text-slate-900 mb-4">
-                        490 ₽
-                        <span class="text-lg font-normal text-slate-500">/месяц</span>
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Pro</h3>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-4xl font-bold text-slate-900">490 ₽</span>
+                        <span class="text-slate-500">/месяц</span>
                     </div>
-                    <p class="text-slate-600">
-                        Для серьёзных спортсменов
-                    </p>
+                    <p class="mt-4 text-slate-600">Для тех, кто готовится к стартам и хочет знать о своей форме всё.</p>
                 </div>
 
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start text-slate-900 font-medium">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">Неограниченное количество тренировок</span>
+                        Безлимитные тренировки
                     </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    <li class="flex items-start text-slate-900 font-medium">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">Расширенная аналитика и графики</span>
+                        Расширенная аналитика (TIZ, пульс)
                     </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    <li class="flex items-start text-slate-900 font-medium">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">Планы подготовки к марафону</span>
+                        Планы подготовки к марафону
                     </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    <li class="flex items-start text-slate-900 font-medium">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">Импорт из Strava и Garmin</span>
+                        Импорт из Strava / Garmin
                     </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    <li class="flex items-start text-slate-900 font-medium">
+                        <svg class="w-5 h-5 text-primary-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
-                        <span class="text-slate-700">Приоритетная поддержка</span>
+                        Приоритетная поддержка
                     </li>
                 </ul>
 
-                <span id="pro-notice" class="sr-only">Тариф Pro ещё недоступен</span>
-                <a href="#notify" class="block w-full px-6 py-3 text-center bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 pointer-events-none opacity-60" aria-disabled="true" aria-describedby="pro-notice">
-                    Узнать о запуске
+                <a href="#notify"
+                    class="block w-full py-3 px-6 text-center rounded-xl bg-primary-600 text-white font-semibold hover:bg-primary-700 shadow-lg shadow-primary-500/25 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+                    Попробовать Pro
                 </a>
             </div>
         </div>
