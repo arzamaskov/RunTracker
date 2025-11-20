@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/arzamaskov/RunTracker/actions/workflows/ci.yml/badge.svg)](https://github.com/arzamaskov/RunTracker/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-![Version](https://img.shields.io/github/v/release/arzamaskov/RunTracker?label=version)
+![Version](https://img.shields.io/github/v/tag/arzamaskov/RunTracker?label=version)
 
 Минималистичное приложение для учёта тренировок и аналитики бега. Готовьтесь к марафону осознанно.
 
