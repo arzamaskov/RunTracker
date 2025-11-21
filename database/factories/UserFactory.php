@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Symfony\Component\Uid\Uuid;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @extends Factory<User>
@@ -26,7 +26,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => Uuid::v7(),
+            'id' => Uuid::uuid7(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
