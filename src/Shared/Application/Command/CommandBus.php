@@ -6,5 +6,7 @@ namespace RunTracker\Shared\Application\Command;
 
 interface CommandBus
 {
-    public function execute(Command $command): void;
+    public function register(string $commandClass, string $handlerClass): void;
+
+    public function execute(Command $command): mixed;
 }

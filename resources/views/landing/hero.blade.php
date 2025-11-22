@@ -21,12 +21,12 @@
         </h1>
 
         <p class="mt-6 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed">
-            Ваш личный центр управления бегом. Глубокая аналитика, контроль нагрузки и фокус на целях — без социального
+            Ваш личный центр управления бегом. Глубокая аналитика, контроль нагрузки и фокус на целях — без лишнего
             шума и рекламы.
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#register"
+            <a href="{{ route('register') }}"
                 class="w-full sm:w-auto px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-2xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
                 Попробовать бесплатно
             </a>
