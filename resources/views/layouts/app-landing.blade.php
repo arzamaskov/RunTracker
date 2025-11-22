@@ -80,11 +80,11 @@
                             </button>
                         </form>
                     @else
-                        <a href="#login"
+                        <a href="{{ route('login') }}"
                             class="px-4 py-2 bg-slate-100 text-slate-800 text-sm rounded-lg hover:bg-slate-200 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
                             Вход
                         </a>
-                        <a href="#register"
+                        <a href="{{ route('register') }}"
                             class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
                             Регистрация
                         </a>
